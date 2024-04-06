@@ -1,0 +1,93 @@
+﻿@page "/register"
+@using BlazorApp2.Data
+
+@inject EmployeeServices EmployeeServices
+
+<h3>Register</h3>
+
+<form @onsubmit="HandleSubmit">
+    <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" class="form-control" id="fullName" @bind="user.FullName" required>
+        <div class="invalid-feedback">Full Name is required.</div>
+    </div>
+     <div class="form-group">
+        <label for="Mobile">Mobile</label>
+        <input type="number" class="form-control" id="Mobile" @bind="user.Mobile" required>
+        <div class="invalid-feedback">Full Name is required.</div>
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" @bind="email" required>
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" @bind="user.Password" required>
+        <div class="invalid-feedback">Password is required.</div>
+    </div>
+    <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" class="form-control" id="confirmPassword" @bind="confirmPassword" required>
+        <div class="invalid-feedback">Please confirm your password.</div>
+    </div>
+    <div class="form-group">
+        <label for="role">Role</label>
+        <select class="form-control" id="role" @bind="user.Role" required>
+            <option value="">Select Role</option>
+            <option value="Admin">Admin</option>
+            <option value="Employee">Employee</option>
+        </select>
+        <div class="invalid-feedback">Please select a role.</div>
+    </div>
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+        <div class="alert alert-danger" role="alert">
+        @errorMessage
+        </div>
+}
+
+@code {
+    User user = new User();
+    string email;
+    string confirmPassword;
+    string errorMessage;
+
+    protected async Task HandleSubmit()
+    {
+        var isValid = ValidateForm();
+        if (!isValid)
+        {
+            return;
+        }
+
+        Email newEmail = new Email { EmailAddress = email, IsPrimary = true }; // Set IsPrimary to true
+        user.Emails.Add(newEmail);
+
+        var result = await EmployeeServices.RegisterUser(user.FullName, email, user.Password, user.Mobile, user.Role); // Register user with IsActive set to true
+        
+
+    }
+
+    private bool ValidateForm()
+    {
+        errorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(user.FullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(user.Password))
+        {
+            errorMessage = "Please fill in all required fields.";
+            return false;
+        }
+
+        if (user.Password != confirmPassword)
+        {
+            errorMessage = "Passwords do not match.";
+            return false;
+        }
+
+        return true;
+    }
+}

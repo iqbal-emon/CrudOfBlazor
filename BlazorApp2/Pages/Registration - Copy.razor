@@ -1,0 +1,140 @@
+﻿@page "/user-profile"
+@using BlazorApp2.Data 
+@inject EmailService EmailService
+@inject UserService UserService
+
+<h2>Update User Information</h2>
+<form>
+    <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input id="fullName" class="form-control" type="text" @bind="user.FullName" />
+    </div>
+    <div class="form-group">
+        <label for="mobile">Mobile</label>
+        <input id="mobile" class="form-control" type="text" @bind="user.Mobile" />
+    </div>
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <input id="Password" class="form-control" type="text" @bind="user.Password" />
+    </div>
+    <button type="submit" class="btn btn-primary" @onclick="UpdateUser">Update</button>
+</form>
+
+<h2>Emails</h2>
+<button type="button" class="btn btn-success" @onclick="ShowAddEmailPopup">Add</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Email Address</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var email in emails)
+        {
+                <tr>
+                    <td>@email.EmailAddress</td>
+                    <td>
+                    @if (email.IsPrimary)
+                    {
+                                <span>Primary</span>
+                    }
+                    else
+                    {
+                                <button type="button" class="btn btn-primary" @onclick="() => MakePrimary(email.Id)">Make Primary</button>
+                                <button type="button" class="btn btn-danger" @onclick="() => ShowDeleteConfirmation(email.Id)">Delete</button>
+                    }
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>
+
+@if (showAddEmailPopup)
+{
+        <div class="popup">
+            <div class="popup-content">
+                <h2>Add Email</h2>
+                <div class="form-group">
+                    <label for="newEmail">Email Address</label>
+                    <input id="newEmail" class="form-control" type="email" @bind="newEmailAddress" />
+                </div>
+                <button type="button" class="btn btn-primary" @onclick="AddEmail">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="CloseAddEmailPopup">Cancel</button>
+            </div>
+        </div>
+}
+
+@code {
+    [Inject] private IJSRuntime JSRuntime { get; set; }
+    private User user = new User();
+    private List<Email> emails = new List<Email>();
+    private string newEmailAddress = "";
+    private bool showAddEmailPopup = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUserData();
+    }
+
+    private async Task LoadUserData()
+    {
+        // Load user data
+        user = await UserService.GetCurrentUser();
+        if (user != null)
+        {
+            // Load user emails
+            emails = await EmailService.GetUserEmails(user.Id);
+        }
+    }
+
+    private async Task UpdateUser()
+    {
+        await UserService.UpdateUser(user);
+    }
+
+    private void ShowAddEmailPopup()
+    {
+        showAddEmailPopup = true;
+    }
+
+    private async Task AddEmail()
+    {
+        if (!string.IsNullOrWhiteSpace(newEmailAddress))
+        {
+            await EmailService.AddEmail(user.Id, newEmailAddress);
+            newEmailAddress = "";
+            showAddEmailPopup = false;
+            await LoadUserData();
+        }
+        // Add validation error handling if needed
+    }
+
+    private async Task MakePrimary(int emailId)
+    {
+        await EmailService.MakePrimary(emailId);
+        await LoadUserData();
+    }
+
+    private async Task ShowDeleteConfirmation(int emailId)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this email?");
+        if (confirmed)
+        {
+            await DeleteEmail(emailId);
+        }
+    }
+
+    private async Task DeleteEmail(int emailId)
+    {
+        await EmailService.DeleteEmail(emailId);
+        await LoadUserData();
+    }
+
+    private void CloseAddEmailPopup()
+    {
+        showAddEmailPopup = false;
+        newEmailAddress = "";
+    }
+}

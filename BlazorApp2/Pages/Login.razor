@@ -1,0 +1,53 @@
+﻿@page "/"
+@using BlazorApp2.Data;
+@inject EmployeeServices EmployeeServices;
+@inject NavigationManager NavigationManager
+<h1>Login</h1>
+<EditForm Model="@loginModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="username">Username</label>
+        <InputText id="username" @bind-Value="loginModel.Username" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <InputText id="password" @bind-Value="loginModel.Password" class="form-control" type="password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</EditForm>
+<a href="/register">Registration</a>
+
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+
+    public class LoginModel
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        var user = await EmployeeServices.GetUserByEmailOrMobile(loginModel.Username);
+
+        if (user != null && await EmployeeServices.ValidateUser(user, loginModel.Password))
+        {
+            var encryptedUserId =(user.Id);
+            Console.WriteLine("user id is", encryptedUserId);
+            await EmployeeServices.SetUserIdInLocalStorage(encryptedUserId);
+            NavigationManager.NavigateTo("/Dashboard");
+
+        }
+        else
+        {
+            // Authentication failed
+            Console.WriteLine("Authentication failed");
+            // Display error message or redirect to login page
+        }
+    }
+
+}
