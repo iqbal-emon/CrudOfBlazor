@@ -14,7 +14,9 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<EmployeeServices>();
 builder.Services.AddScoped<EmailService>();
+
 builder.Services.AddScoped<UserService>();
+
 builder.Services.AddScoped<SkillService>();
 
 
