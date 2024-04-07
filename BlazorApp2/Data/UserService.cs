@@ -56,7 +56,14 @@ namespace BlazorApp2.Data
             }
         }
 
-
+        public async Task<List<User>> GetUsersBySkillIdAsync(int skillId)
+        {
+            // This query assumes that your User entity's Skill collection
+            // is properly configured to represent the many-to-many relationship between Users and Skills
+            return await _context.Users
+                                 .Where(u => u.Skill.Any(s => s.id == skillId))
+                                 .ToListAsync();
+        }
 
     }
 }

@@ -58,6 +58,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2tpbGxFbXBsb3llZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/EMON/source/repos/BlazorApp2/BlazorApp2/Pages/UserMangement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hbmdlbWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/EMON/source/repos/BlazorApp2/BlazorApp2/Shared/LoginLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExvZ2luTGF5b3V0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 

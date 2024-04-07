@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorApp2.Data
 {
@@ -80,10 +81,29 @@ namespace BlazorApp2.Data
             return await _context.Users.Include(u => u.Emails).ToListAsync();
         }
 
+
+        public async Task<string> GetPrimaryEmailAsync(User user)
+        {
+            var primaryEmail = await _context.Emails
+                                              .Where(e => e.UserId == user.Id && e.IsPrimary)
+                                              .Select(e => e.EmailAddress)
+                                              .FirstOrDefaultAsync();
+            return primaryEmail;
+        }
+
+
+
         public async Task UpdateEmployeeAsync(User user)
         {
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+        }
+        public async Task<List<Skill>> GetSkillsByUserIdAsync(int userId)
+        {
+            var userSkills = await _context.Skills
+                                            .Where(s => s.UserId == userId)
+                                            .ToListAsync();
+            return userSkills;
         }
     }
 }

@@ -51,5 +51,7 @@ namespace BlazorApp2.Data
             // Return a default value or handle error appropriately
             return 0;
         }
+
     }
+
 }

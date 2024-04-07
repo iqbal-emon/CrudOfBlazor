@@ -1,6 +1,5 @@
 ﻿@page "/employees"
 @using BlazorApp2.Data
-
 @inject EmployeeServices EmployeeService
 
 <h2>Employee List</h2>
@@ -19,7 +18,7 @@
         {
             <tr>
                 <td>@user.FullName</td>
-                <td>@GetPrimaryEmail(user)</td>
+                <td>@primaryEmails[user.Id]</td> <!-- Access email using the user's Id -->
                 <td>@(user.IsActive ? "Active" : "Inactive")</td>
                 <td>
                     @if (user.IsActive)
@@ -38,28 +37,29 @@
 
 @code {
     private List<User> users = new List<User>();
+    private Dictionary<int, string> primaryEmails = new Dictionary<int, string>(); // Assuming User.Id is an int
 
     protected override async Task OnInitializedAsync()
     {
         users = await EmployeeService.GetEmployeesAsync();
-    }
-
-    private string GetPrimaryEmail(User user)
-    {
-        // Assuming there's a method to fetch the primary email from the Email table
-        var primaryEmail = ""; // Replace this with the actual logic to get the primary email
-        return primaryEmail;
+        foreach (var user in users)
+        {
+            var email = await EmployeeService.GetPrimaryEmailAsync(user); // Fetch the primary email
+            primaryEmails[user.Id] = email; // Store it in the dictionary
+        }
     }
 
     private async Task ActivateEmployee(User user)
     {
         user.IsActive = true;
         await EmployeeService.UpdateEmployeeAsync(user);
+        // Optionally refresh the user list or individual user status
     }
 
     private async Task DeactivateEmployee(User user)
     {
         user.IsActive = false;
         await EmployeeService.UpdateEmployeeAsync(user);
+        // Optionally refresh the user list or individual user status
     }
 }
