@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BlazorApp2.Data;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlazorApp2
@@ -13,7 +14,10 @@ namespace BlazorApp2
         public string Role { get; set; }
         public bool IsActive { get; set; }
         public virtual ICollection<Email> Emails { get; set; } = new List<Email>();
-        public virtual ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
-      
+        public virtual ICollection<Skill> Skill { get; set; } = new List<Skill>();
+        public virtual ICollection<Employee> Employee { get; set; } = new List<Employee>();
+
+
+
     }
 }

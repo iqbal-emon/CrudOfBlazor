@@ -1,15 +1,35 @@
 ﻿@page "/Dashboard"
-<div class="sidebar"  >
+@using BlazorApp2.Data
+@inject UserService UserService
 
+<div class="sidebar">
     <div class="nav-item px-3">
         <NavLink class="nav-link" href="user-profile" Match="NavLinkMatch.All">
             <span class="oi oi-home" aria-hidden="true"></span> Profile
         </NavLink>
     </div>
     <div class="nav-item px-3">
-        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-            <span class="oi oi-home" aria-hidden="true"></span> Home
+        <NavLink class="nav-link" href="Skill" Match="NavLinkMatch.All">
+            <span class="oi oi-home" aria-hidden="true"></span> My Skills
         </NavLink>
     </div>
-
+    @if (UserRole == "Admin")
+    {
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="employees" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Employees
+            </NavLink>
+        </div>
+    }
 </div>
+
+@code {
+    string UserRole { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserRole = await UserService.GetUserRoleAsync();
+        Console.WriteLine("userrole is", UserRole);
+    }
+
+}

@@ -46,5 +46,6 @@ namespace BlazorApp2.Data
                 await _context.SaveChangesAsync();
             }
         }
+        
     }
 }

@@ -4,6 +4,7 @@ using BlazorApp2.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorApp2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240407085854_third")]
+    partial class third
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,33 +23,6 @@ namespace BlazorApp2.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("BlazorApp2.Data.Skill", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SkillName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Skills");
-                });
 
             modelBuilder.Entity("BlazorApp2.Email", b =>
                 {
@@ -82,26 +57,50 @@ namespace BlazorApp2.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<decimal?>("BasicSalary")
+                    b.Property<decimal>("BasicSalary")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("EducationalQualification")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("JoiningDate")
+                    b.Property<DateTime>("JoiningDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.HasKey("Id");
+
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("BlazorApp2.Skill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SkillName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeeId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("BlazorApp2.User", b =>
@@ -133,19 +132,6 @@ namespace BlazorApp2.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("BlazorApp2.Data.Skill", b =>
-                {
-                    b.HasOne("BlazorApp2.Employee", null)
-                        .WithMany("Skills")
-                        .HasForeignKey("EmployeeId");
-
-                    b.HasOne("BlazorApp2.User", null)
-                        .WithMany("Skill")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("BlazorApp2.Email", b =>
                 {
                     b.HasOne("BlazorApp2.User", "User")
@@ -157,15 +143,15 @@ namespace BlazorApp2.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BlazorApp2.Employee", b =>
+            modelBuilder.Entity("BlazorApp2.Skill", b =>
                 {
-                    b.HasOne("BlazorApp2.User", "User")
-                        .WithMany("Employee")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("BlazorApp2.Employee", null)
+                        .WithMany("Skills")
+                        .HasForeignKey("EmployeeId");
 
-                    b.Navigation("User");
+                    b.HasOne("BlazorApp2.User", null)
+                        .WithMany("UserSkills")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("BlazorApp2.Employee", b =>
@@ -177,9 +163,7 @@ namespace BlazorApp2.Migrations
                 {
                     b.Navigation("Emails");
 
-                    b.Navigation("Employee");
-
-                    b.Navigation("Skill");
+                    b.Navigation("UserSkills");
                 });
 #pragma warning restore 612, 618
         }

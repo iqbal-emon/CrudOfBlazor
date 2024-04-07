@@ -1,13 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.ComponentModel.DataAnnotations;
-
-namespace BlazorApp2
+﻿namespace BlazorApp2.Data
 {
     public class Skill
     {
-       [Key]
-        public int Id { get; set; }
+        public int id { get; set; }
         public string SkillName { get; set; }
-        public virtual ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
+        public int UserId { get; set; }
+
+
     }
 }

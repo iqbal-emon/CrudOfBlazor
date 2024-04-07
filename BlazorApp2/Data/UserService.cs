@@ -1,5 +1,6 @@
 ﻿using BlazorApp2.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
 using System.Threading.Tasks;
 
 namespace BlazorApp2.Data
@@ -7,10 +8,11 @@ namespace BlazorApp2.Data
     public class UserService
     {
         private readonly ApplicationDbContext _context;
-
-        public UserService(ApplicationDbContext context)
+        private readonly IJSRuntime _jsRuntime;
+        public UserService(ApplicationDbContext applicationDbContext, IJSRuntime jsRuntime)
         {
-            _context = context;
+            _context = applicationDbContext;
+            _jsRuntime = jsRuntime;
         }
 
         public async Task<User> GetCurrentUser()
@@ -26,5 +28,35 @@ namespace BlazorApp2.Data
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
+
+
+        public async Task<string> GetUserRoleAsync()
+        {
+            // Retrieve the user ID from localStorage
+            var userIdString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userId");
+
+            // Parse the user ID string to an integer
+            if (int.TryParse(userIdString, out int userId))
+            {
+                // User ID successfully parsed, now you can use it
+                Console.WriteLine("User ID: " + userId);
+
+                // Find the user in the database using the parsed user ID
+                var user = await _context.Users.FindAsync(userId);
+
+                // Return the user's role
+                return user?.Role;
+            }
+            else
+            {
+                // Unable to parse the user ID string to an integer
+                Console.WriteLine("Failed to parse user ID: " + userIdString);
+                // Handle the error or provide a default value
+                return "DefaultRole"; // Provide a default role or handle the error as needed
+            }
+        }
+
+
+
     }
 }

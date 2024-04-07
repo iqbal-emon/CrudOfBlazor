@@ -68,7 +68,7 @@
         user.Emails.Add(newEmail);
 
         var result = await EmployeeServices.RegisterUser(user.FullName, email, user.Password, user.Mobile, user.Role); // Register user with IsActive set to true
-        
+        Console.WriteLine(result);
 
     }
 

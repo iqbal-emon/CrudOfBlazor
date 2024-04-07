@@ -19,8 +19,7 @@ namespace BlazorApp2.Data
             _context = applicationDbContext;
             _jsRuntime = jsRuntime;
         }
-
-        public async Task<IActionResult> RegisterUser(string fullName, string email, string password, string Mobile, string role)
+        public async Task<IActionResult> RegisterUser(string fullName, string email, string password, string mobile, string role)
         {
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
@@ -29,7 +28,7 @@ namespace BlazorApp2.Data
                 FullName = fullName,
                 Password = hashedPassword,
                 IsActive = true,
-                Mobile = Mobile,
+                Mobile = mobile,
                 Role = role
             };
 
@@ -41,11 +40,21 @@ namespace BlazorApp2.Data
 
             user.Emails = new List<Email> { userEmail };
 
+
+
+            var userEmployee = new Employee
+            {
+                BasicSalary = 1000
+                
+            };
+            user.Employee=new List<Employee> { userEmployee };
+
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // Save the user to get the generated Id
 
             return new OkObjectResult("User registered successfully.");
         }
+
 
         public async Task SetUserIdInLocalStorage(int userId)
         {
@@ -65,6 +74,16 @@ namespace BlazorApp2.Data
                 return false;
 
             return BCrypt.Net.BCrypt.Verify(password, user.Password);
+        }
+        public async Task<List<User>> GetEmployeesAsync()
+        {
+            return await _context.Users.Include(u => u.Emails).ToListAsync();
+        }
+
+        public async Task UpdateEmployeeAsync(User user)
+        {
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
     }
 }

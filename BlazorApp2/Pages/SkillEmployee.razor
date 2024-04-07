@@ -1,0 +1,70 @@
+﻿@page "/Skill"
+@using BlazorApp2.Data
+@inject SkillService SkillService
+
+<h2>User Skills Management</h2>
+
+<form>
+    <label for="skillName">Skill Name:</label>
+    <input id="skillName" type="text" @bind="newSkillName" />
+    <button type="button" @onclick="AddSkill">Add Skill</button>
+</form>
+
+<br />
+
+@if (skills != null && skills.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Skill Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var skill in skills)
+            {
+                <tr>
+                    <td>@skill.SkillName</td>
+                    <td><button class="btn btn-danger" @onclick="() => DeleteSkill(skill)">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No skills available.</p>
+}
+
+@code {
+    private string newSkillName;
+    private List<Skill> skills = new List<Skill>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSkills();
+    }
+
+    private async Task LoadSkills()
+    {
+        skills = await SkillService.GetSkillsAsync();
+    }
+
+    private async Task AddSkill()
+    {
+        if (!string.IsNullOrWhiteSpace(newSkillName))
+        {
+            var newSkill = new Skill { SkillName = newSkillName };
+            await SkillService.AddSkillAsync(newSkill);
+            newSkillName = string.Empty; // Clear the input field
+            await LoadSkills(); // Reload skills list
+        }
+    }
+
+    private async Task DeleteSkill(Skill skill)
+    {
+        await SkillService.DeleteSkillAsync(skill);
+        await LoadSkills(); // Reload skills list
+    }
+}

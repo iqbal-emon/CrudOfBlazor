@@ -1,0 +1,65 @@
+﻿@page "/employees"
+@using BlazorApp2.Data
+
+@inject EmployeeServices EmployeeService
+
+<h2>Employee List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Primary Email</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in users)
+        {
+            <tr>
+                <td>@user.FullName</td>
+                <td>@GetPrimaryEmail(user)</td>
+                <td>@(user.IsActive ? "Active" : "Inactive")</td>
+                <td>
+                    @if (user.IsActive)
+                    {
+                        <button class="btn btn-danger" @onclick="() => DeactivateEmployee(user)">Deactivate</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-success" @onclick="() => ActivateEmployee(user)">Activate</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<User> users = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await EmployeeService.GetEmployeesAsync();
+    }
+
+    private string GetPrimaryEmail(User user)
+    {
+        // Assuming there's a method to fetch the primary email from the Email table
+        var primaryEmail = ""; // Replace this with the actual logic to get the primary email
+        return primaryEmail;
+    }
+
+    private async Task ActivateEmployee(User user)
+    {
+        user.IsActive = true;
+        await EmployeeService.UpdateEmployeeAsync(user);
+    }
+
+    private async Task DeactivateEmployee(User user)
+    {
+        user.IsActive = false;
+        await EmployeeService.UpdateEmployeeAsync(user);
+    }
+}

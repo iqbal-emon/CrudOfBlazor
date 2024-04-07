@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BlazorApp2.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorApp2
 {
@@ -6,10 +7,13 @@ namespace BlazorApp2
     {
         [Key]
         public int Id { get; set; }
-        public string EmployeeName { get; set; }
-        public string EducationalQualification { get; set; }
-        public decimal BasicSalary { get; set; }
-        public DateTime JoiningDate { get; set; }
-        public virtual ICollection<UserSkill> Skills { get; set; } = new List<UserSkill>();
+        public int UserId { get; set; }
+        public string? EmployeeName { get; set; }
+        public string? EducationalQualification { get; set; }
+        public decimal? BasicSalary { get; set; }
+        public DateTime?  JoiningDate { get; set; }
+        public virtual User User { get; set; }
+
+        public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
     }
 }
